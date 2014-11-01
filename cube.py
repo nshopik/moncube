@@ -3,13 +3,11 @@ from win32process import GetWindowThreadProcessId
 import win32api
 import psutil
 from time import sleep, localtime, time, strftime
-import json
 
 # local import
 import jsonwrite as log
 TotalIdle = 0
 logfile = strftime("%Y-%m-%d", localtime())
-ActivePIDs = []
 
 print ('Cube Version 0.1\r\n', logfile + '.log')
 def getActiveWindow(idle):
@@ -24,7 +22,6 @@ def getActiveWindow(idle):
 	pctime = p.create_time()
 	global TotalIdle
 	sleep(1)
-	print (getProcessHandle(wpid[1]))
 	if idle > getIdleTime():
 		TotalIdle = TotalIdle + idle
 	if curw != GetWindowText(GetForegroundWindow()):
