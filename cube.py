@@ -8,31 +8,18 @@ from time import sleep, localtime, time, strftime
 import jsonwrite as log
 TotalIdle = 0
 logfile = strftime("%Y-%m-%d", localtime())
+LastWin = []
+ActiveTime = int(time())
 
-print ('Cube Version 0.1\r\n', logfile + '.log')
-def getActiveWindow(idle):
+print ('Cube Version 0.2\r\n', logfile + '.log')
+def getActiveWindow():
 	hwnd = GetForegroundWindow()
 	if hwnd == 0:
 		sleep (0.1)
-		return getActiveWindow(getIdleTime())
+		return getActiveWindow()
 	curw = GetWindowText(hwnd)
 	wpid = GetWindowThreadProcessId(hwnd)
-	p = psutil.Process(wpid[1])
-	pexe = p.exe()
-	pctime = p.create_time()
-	global TotalIdle
-	sleep(1)
-	if idle > getIdleTime():
-		TotalIdle = TotalIdle + idle
-	if curw != GetWindowText(GetForegroundWindow()):
-		data = {}
-		data['PID'] = wpid[1]
-		data['EXE'] = pexe
-		data['CTime'] = int(pctime)
-		data['WTitle'] = curw
-		data['idleTimer'] = TotalIdle
-		log.jsonwrite(data, logfile)
-		TotalIdle = 0
+	return curw, wpid[1]
 
 def getProcessHandle(wpid):
 	handle = win32api.OpenProcess(0x10000410, False, wpid)
@@ -43,4 +30,25 @@ def getIdleTime():
 	return millis / 1000.0
 
 while True:
-	getActiveWindow(getIdleTime())
+	window = getActiveWindow()
+	if not LastWin:
+		LastWin = window
+	if LastWin[0] != GetWindowText(GetForegroundWindow()):
+		p = psutil.Process(LastWin[1])
+		data = {}
+		data['PID'] = LastWin[1]
+		data['EXE'] = p.name()
+		data['CTime'] = int(p.create_time())
+		data['WTitle'] = LastWin[0]
+		data['idleTime'] = TotalIdle
+		data['ActiveTime'] = int(time()) - ActiveTime
+		log.jsonwrite(data, logfile)
+		TotalIdle = 0
+		#print (int(time()) - ActiveTime)
+		LastWin = []
+		ActiveTime = int(time())
+	else:
+		idle = getIdleTime()
+		sleep(1)
+		if idle > getIdleTime():
+			TotalIdle = TotalIdle + idle
