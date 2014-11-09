@@ -3,6 +3,7 @@ from win32process import GetWindowThreadProcessId
 import win32api
 import psutil
 from time import sleep, localtime, time, strftime
+from collections import OrderedDict
 
 # local import
 import jsonwrite as log
@@ -12,7 +13,7 @@ LastWin = []
 ActiveTime = int(time())
 pid = 0
 
-print ('Cube Version 0.2\r\n', logfile + '.log')
+print ('Cube Version 0.2.1\r\n', logfile + '.log')
 def getActiveWindow():
 	hwnd = GetForegroundWindow()
 	if hwnd == 0:
@@ -44,7 +45,7 @@ while True:
 	if not LastWin:
 		LastWin = window
 	if LastWin[0] != GetWindowText(GetForegroundWindow()):
-		data = {}
+		data = OrderedDict()
 		data['PID'] = pid
 		data['EXE'] = exe
 		data['CTime'] = ctime
