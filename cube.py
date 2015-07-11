@@ -50,7 +50,7 @@ while True:
 		data['EXE'] = exe
 		data['CTime'] = ctime
 		data['WTitle'] = LastWin[0]
-		data['idleTime'] = TotalIdle
+		data['idleTime'] = int(TotalIdle)
 		data['ActiveTime'] = int(time()) - ActiveTime
 		log.jsonwrite(data, logfile)
 		TotalIdle = 0
